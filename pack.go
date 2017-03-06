@@ -1,3 +1,5 @@
+// Package qpack provides fast data (de)serializing.
+// Maintainer: Jeroen van der Heijden / Transceptor Technology
 package qpack
 
 import (
