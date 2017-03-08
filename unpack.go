@@ -40,7 +40,7 @@ func unpack(b *[]byte, v *interface{}, pos *int, end int) error {
 		'\x76', '\x77', '\x78', '\x79', '\x7a', '\x7b':
 		*v = 63 - int(tp)
 	case '\x7c':
-		*v = nil
+		*v = nil // Reserved for Object Hook.
 	case '\x7d':
 		*v = -1.0
 	case '\x7e':
@@ -184,6 +184,7 @@ func unpack(b *[]byte, v *interface{}, pos *int, end int) error {
 			}
 			slice = append(slice, val)
 		}
+		(*pos)++
 		*v = slice
 	case '\xfd':
 		m := make(map[interface{}]interface{})
@@ -207,6 +208,7 @@ func unpack(b *[]byte, v *interface{}, pos *int, end int) error {
 			}
 			m[key] = val
 		}
+		(*pos)++
 		*v = m
 	case '\xfe', '\xff':
 		*v = tp

@@ -15,6 +15,29 @@ func Pack(v interface{}) ([]byte, error) {
 	return b, err
 }
 
+func packInt(b *[]byte, i int) error {
+	if i >= 0 && i < 64 {
+		*b = append(*b, uint8(i))
+	} else if i >= -60 && i < 0 {
+		*b = append(*b, uint8(63-i))
+	} else if int(int8(i)) == i {
+		*b = append(*b, '\xe8')
+		*b = append(*b, byte(i))
+	} else if int(int16(i)) == i {
+		*b = append(*b, '\xe9')
+		*b = append(*b, int16toBytes(int16(i))...)
+	} else if int(int32(i)) == i {
+		*b = append(*b, '\xea')
+		*b = append(*b, int32toBytes(int32(i))...)
+	} else if int(int64(i)) == i {
+		*b = append(*b, '\xeb')
+		*b = append(*b, int64toBytes(int64(i))...)
+	} else {
+		return fmt.Errorf("Cannot int: %d", i)
+	}
+	return nil
+}
+
 func pack(b *[]byte, v interface{}) error {
 
 	if v == true {
@@ -31,28 +54,16 @@ func pack(b *[]byte, v interface{}) error {
 	}
 	t := reflect.TypeOf(v)
 	switch t.Kind() {
+	case reflect.Int8:
+		return packInt(b, int(v.(int8)))
+	case reflect.Int16:
+		return packInt(b, int(v.(int16)))
+	case reflect.Int32:
+		return packInt(b, int(v.(int32)))
+	case reflect.Int64:
+		return packInt(b, int(v.(int64)))
 	case reflect.Int:
-		i := v.(int)
-		if i >= 0 && i < 64 {
-			*b = append(*b, uint8(i))
-		} else if i >= -60 && i < 0 {
-			*b = append(*b, uint8(63-i))
-		} else if int(int8(i)) == i {
-			*b = append(*b, '\xe8')
-			*b = append(*b, byte(i))
-		} else if int(int16(i)) == i {
-			*b = append(*b, '\xe9')
-			*b = append(*b, int16toBytes(int16(i))...)
-		} else if int(int32(i)) == i {
-			*b = append(*b, '\xea')
-			*b = append(*b, int32toBytes(int32(i))...)
-		} else if int(int64(i)) == i {
-			*b = append(*b, '\xeb')
-			*b = append(*b, int64toBytes(int64(i))...)
-		} else {
-			return fmt.Errorf("Cannot int: %d", i)
-		}
-		return nil
+		return packInt(b, v.(int))
 	case reflect.Float64:
 		f := v.(float64)
 		if f == 0.0 {
