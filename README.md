@@ -1,2 +1,2 @@
-# qpack-go
+# go-qpack
 QPack (De-)Serialize 
