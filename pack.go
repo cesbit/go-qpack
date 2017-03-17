@@ -79,7 +79,7 @@ func pack(b *[]byte, v interface{}) error {
 		return nil
 	case reflect.String:
 		bstr := []byte(v.(string))
-		l := len(bstr)
+		l := int64(len(bstr))
 		switch {
 		case l < 0x64:
 			*b = append(*b, uint8(0x80+l))
