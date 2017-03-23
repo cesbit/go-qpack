@@ -14,8 +14,8 @@ func TestUnpack(t *testing.T) {
 		err error
 	}{
 		{[]byte{
-			140, 72, 101, 108, 108, 111, 44, 32, 119, 111, 114, 108, 100},
-			nil}, // Hello, world
+			140, 239, 163, 159, 32, 72, 105, 32, 81, 112, 97, 99, 107},
+			nil}, // " Hi Qpack
 		{[]byte{249}, nil},                                        // false
 		{[]byte{250}, nil},                                        // true
 		{[]byte{251}, nil},                                        // nil
