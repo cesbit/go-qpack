@@ -1,5 +1,8 @@
 # Go-QPack
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/transceptor-technology/go-qpack)](https://goreportcard.com/report/github.com/transceptor-technology/go-qpack)
+[![GoDoc](https://godoc.org/github.com/transceptor-technology/go-qpack?status.svg)](https://godoc.org/github.com/transceptor-technology/go-qpack)
+
 A fast (de)serializer for the Go language
 
 ---------------------------------------
