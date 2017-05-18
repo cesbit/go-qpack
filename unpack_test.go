@@ -50,7 +50,7 @@ func TestUnpack(t *testing.T) {
 	}
 	for _, c := range cases {
 		if c.err == nil {
-			got, err := Unpack(c.in)
+			got, err := Unpack(c.in, 0)
 			if err != nil {
 				t.Errorf(
 					"Unpack(%q) returned an unexpexted error: %s", c.in, c.err)
@@ -63,7 +63,7 @@ func TestUnpack(t *testing.T) {
 				}
 			}
 		} else {
-			_, err := Unpack(c.in)
+			_, err := Unpack(c.in, 0)
 			t.Errorf("Error: %v", err)
 		}
 	}

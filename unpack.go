@@ -7,15 +7,18 @@ import (
 	"fmt"
 )
 
+// QpFlagStringKeysOnly returns each map as map[string]interface{}
+const QpFlagStringKeysOnly int = 1
+
 // Unpack return an interface containing deserialized data.
-func Unpack(b []byte) (interface{}, error) {
+func Unpack(b []byte, flags int) (interface{}, error) {
 	var v interface{}
 	pos := 0
-	err := unpack(&b, &v, &pos, len(b))
+	err := unpack(&b, &v, &pos, len(b), flags)
 	return v, err
 }
 
-func unpack(b *[]byte, v *interface{}, pos *int, end int) error {
+func unpack(b *[]byte, v *interface{}, pos *int, end, flags int) error {
 	if *pos >= end {
 		return fmt.Errorf("Unpack() is missing data at position: %d", *pos)
 	}
@@ -142,7 +145,7 @@ func unpack(b *[]byte, v *interface{}, pos *int, end int) error {
 		n := int(tp) - 237
 		slice := make([]interface{}, n)
 		for i := 0; i < n; i++ {
-			err := unpack(b, &slice[i], pos, end)
+			err := unpack(b, &slice[i], pos, end, flags)
 			if err != nil {
 				return err
 			}
@@ -150,20 +153,43 @@ func unpack(b *[]byte, v *interface{}, pos *int, end int) error {
 		*v = slice
 	case '\xf3', '\xf4', '\xf5', '\xf6', '\xf7', '\xf8':
 		n := int(tp) - 243
-		m := make(map[interface{}]interface{})
-		var key, val interface{}
-		for i := 0; i < n; i++ {
-			err := unpack(b, &key, pos, end)
-			if err != nil {
-				return err
+		if flags&QpFlagStringKeysOnly == 0 {
+			m := make(map[interface{}]interface{})
+			var key, val interface{}
+			for i := 0; i < n; i++ {
+				err := unpack(b, &key, pos, end, flags)
+				if err != nil {
+					return err
+				}
+				err = unpack(b, &val, pos, end, flags)
+				if err != nil {
+					return err
+				}
+				m[key] = val
 			}
-			err = unpack(b, &val, pos, end)
-			if err != nil {
-				return err
+			*v = m
+		} else {
+			m := make(map[string]interface{})
+			var key, val interface{}
+			for i := 0; i < n; i++ {
+				err := unpack(b, &key, pos, end, flags)
+				if err != nil {
+					return err
+				}
+				err = unpack(b, &val, pos, end, flags)
+				if err != nil {
+					return err
+				}
+				keystr, ok := key.(string)
+				if !ok {
+					return fmt.Errorf(
+						"Unpack() got an non string value for key at position: %d",
+						*pos)
+				}
+				m[keystr] = val
 			}
-			m[key] = val
+			*v = m
 		}
-		*v = m
 	case '\xf9':
 		*v = true
 	case '\xfa':
@@ -174,7 +200,7 @@ func unpack(b *[]byte, v *interface{}, pos *int, end int) error {
 		slice := make([]interface{}, 0)
 		var val interface{}
 		for *pos < end && (*b)[*pos] != '\xfe' {
-			err := unpack(b, &val, pos, end)
+			err := unpack(b, &val, pos, end, flags)
 			if err != nil {
 				return err
 			} else if val == '\xff' {
@@ -187,29 +213,60 @@ func unpack(b *[]byte, v *interface{}, pos *int, end int) error {
 		(*pos)++
 		*v = slice
 	case '\xfd':
-		m := make(map[interface{}]interface{})
-		var key, val interface{}
-		for *pos < end && (*b)[*pos] != '\xff' {
-			err := unpack(b, &key, pos, end)
-			if err != nil {
-				return err
-			} else if key == '\xfe' {
-				return fmt.Errorf(
-					"Unpack() got an unexpected close array at position: %d",
-					*pos)
+		if flags&QpFlagStringKeysOnly == 0 {
+			m := make(map[interface{}]interface{})
+			var key, val interface{}
+			for *pos < end && (*b)[*pos] != '\xff' {
+				err := unpack(b, &key, pos, end, flags)
+				if err != nil {
+					return err
+				} else if key == '\xfe' {
+					return fmt.Errorf(
+						"Unpack() got an unexpected close array at position: %d",
+						*pos)
+				}
+				err = unpack(b, &val, pos, end, flags)
+				if err != nil {
+					return err
+				} else if val == '\xfe' {
+					return fmt.Errorf(
+						"Unpack() got an unexpected close array at position: %d",
+						*pos)
+				}
+				m[key] = val
 			}
-			err = unpack(b, &val, pos, end)
-			if err != nil {
-				return err
-			} else if val == '\xfe' {
-				return fmt.Errorf(
-					"Unpack() got an unexpected close array at position: %d",
-					*pos)
+			*v = m
+		} else {
+			m := make(map[string]interface{})
+			var key, val interface{}
+			for *pos < end && (*b)[*pos] != '\xff' {
+				err := unpack(b, &key, pos, end, flags)
+				if err != nil {
+					return err
+				} else if key == '\xfe' {
+					return fmt.Errorf(
+						"Unpack() got an unexpected close array at position: %d",
+						*pos)
+				}
+				err = unpack(b, &val, pos, end, flags)
+				if err != nil {
+					return err
+				} else if val == '\xfe' {
+					return fmt.Errorf(
+						"Unpack() got an unexpected close array at position: %d",
+						*pos)
+				}
+				keystr, ok := key.(string)
+				if !ok {
+					return fmt.Errorf(
+						"Unpack() got an non string value for key at position: %d",
+						*pos)
+				}
+				m[keystr] = val
 			}
-			m[key] = val
+			*v = m
 		}
 		(*pos)++
-		*v = m
 	case '\xfe', '\xff':
 		*v = tp
 	default:
