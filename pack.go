@@ -54,6 +54,34 @@ func pack(b *[]byte, v interface{}) error {
 	}
 	t := reflect.TypeOf(v)
 	switch t.Kind() {
+	case reflect.Struct:
+		m := reflect.ValueOf(v)
+		n := m.NumField()
+		if n >= 6 {
+			*b = append(*b, '\xfd') // Open map
+		} else {
+			*b = append(*b, uint8('\xf3'+n)) // Fixed size map
+		}
+		for i := 0; i < n; i++ {
+			field := t.Field(i)
+			fn := field.Tag.Get("qp")
+			if len(fn) == 0 {
+				fn = field.Name
+			}
+			err := pack(b, fn)
+			if err != nil {
+				return err
+			}
+			val := m.Field(i)
+			err = pack(b, val.Interface())
+			if err != nil {
+				return err
+			}
+		}
+		if n >= 6 {
+			*b = append(*b, '\xff') // Close map
+		}
+		return nil
 	case reflect.Int8:
 		return packInt(b, int(v.(int8)))
 	case reflect.Int16:

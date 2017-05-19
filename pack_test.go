@@ -9,6 +9,11 @@ func TestPack(t *testing.T) {
 	var m = make(map[interface{}]interface{})
 	m["Names"] = []string{"Iris", "Sasha"}
 
+	type TestQp struct {
+		Name string `qp:"myname"`
+	}
+	testQp := TestQp{Name: "Iris"}
+
 	cases := []struct {
 		in   interface{}
 		want []byte
@@ -16,6 +21,7 @@ func TestPack(t *testing.T) {
 	}{
 		{" Hi Qpack", []byte{
 			140, 239, 163, 159, 32, 72, 105, 32, 81, 112, 97, 99, 107}, nil},
+		{testQp, []byte{244, 134, 109, 121, 110, 97, 109, 101, 132, 73, 114, 105, 115}, nil},
 		{true, []byte{249}, nil},
 		{false, []byte{250}, nil},
 		{nil, []byte{251}, nil},
@@ -55,7 +61,7 @@ func TestPack(t *testing.T) {
 			got, err := Pack(c.in)
 			if err != nil {
 				t.Errorf(
-					"Pack(%q) returned an unexpexted error: %s", c.in, c.err)
+					"Pack(%q) returned an unexpexted error: %s", c.in, err)
 			} else if !bytes.Equal(got, c.want) {
 				t.Errorf("Pack(%v) == %v, want %v", c.in, got, c.want)
 			}
