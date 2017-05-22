@@ -4,6 +4,7 @@ package qpack
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"reflect"
 )
@@ -106,6 +107,17 @@ func pack(b *[]byte, v interface{}) error {
 		}
 		return nil
 	case reflect.String:
+		jn, ok := v.(json.Number)
+		if ok {
+			ti, err := jn.Int64()
+			if err == nil {
+				return packInt(b, int(ti))
+			}
+			tf, err := jn.Float64()
+			if err == nil {
+				return pack(b, tf)
+			}
+		}
 		bstr := []byte(v.(string))
 		l := int64(len(bstr))
 		switch {
