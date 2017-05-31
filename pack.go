@@ -55,6 +55,8 @@ func pack(b *[]byte, v interface{}) error {
 	}
 	t := reflect.TypeOf(v)
 	switch t.Kind() {
+	case reflect.Ptr:
+		return pack(b, reflect.Indirect(reflect.ValueOf(v)).Interface())
 	case reflect.Struct:
 		m := reflect.ValueOf(v)
 		n := m.NumField()
@@ -91,6 +93,14 @@ func pack(b *[]byte, v interface{}) error {
 		return packInt(b, int(v.(int32)))
 	case reflect.Int64:
 		return packInt(b, int(v.(int64)))
+	case reflect.Uint8:
+		return packInt(b, int(v.(uint8)))
+	case reflect.Uint16:
+		return packInt(b, int(v.(uint16)))
+	case reflect.Uint32:
+		return packInt(b, int(v.(uint32)))
+	case reflect.Uint64:
+		return packInt(b, int(v.(uint64)))
 	case reflect.Int:
 		return packInt(b, v.(int))
 	case reflect.Float64:
@@ -146,7 +156,7 @@ func pack(b *[]byte, v interface{}) error {
 		}
 		*b = append(*b, bstr...)
 		return nil
-	case reflect.Slice:
+	case reflect.Slice, reflect.Array:
 		slice := reflect.ValueOf(v)
 		n := slice.Len()
 		if n >= 6 {
