@@ -16,6 +16,12 @@ func Pack(v interface{}) ([]byte, error) {
 	return b, err
 }
 
+// PackTo uses a pre-allocated byte slice to append the serialized data for argument v.
+func PackTo(b *[]byte, v interface{}) error {
+	err := pack(b, v)
+	return err
+}
+
 func packInt(b *[]byte, i int) error {
 	if i >= 0 && i < 64 {
 		*b = append(*b, uint8(i))
