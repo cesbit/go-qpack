@@ -1,15 +1,14 @@
-# Go-QPack
+[![CI](https://github.com/transceptor-technology/go-qpack/workflows/CI/badge.svg)](https://github.com/transceptor-technology/go-qpack/actions)
+[![Release Version](https://img.shields.io/github/release/transceptor-technology/go-qpack)](https://github.com/transceptor-technology/go-qpack/releases)
 
-[![Build Status](https://travis-ci.com/transceptor-technology/go-qpack.svg?branch=master)](https://travis-ci.com/transceptor-technology/go-qpack)
-[![Go Report Card](https://goreportcard.com/badge/github.com/transceptor-technology/go-qpack)](https://goreportcard.com/report/github.com/transceptor-technology/go-qpack)
-[![GoDoc](https://godoc.org/github.com/transceptor-technology/go-qpack?status.svg)](https://godoc.org/github.com/transceptor-technology/go-qpack)
+# Go-QPack
 
 A fast (de)serializer for the Go language
 
 ---------------------------------------
   * [Installation](#installation)
   * [Usage](#usage)
-  
+
 ---------------------------------------
 
 ## Installation
