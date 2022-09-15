@@ -1,5 +1,5 @@
-[![CI](https://github.com/transceptor-technology/go-qpack/workflows/CI/badge.svg)](https://github.com/transceptor-technology/go-qpack/actions)
-[![Release Version](https://img.shields.io/github/release/transceptor-technology/go-qpack)](https://github.com/transceptor-technology/go-qpack/releases)
+[![CI](https://github.com/cesbit/go-qpack/workflows/CI/badge.svg)](https://github.com/cesbit/go-qpack/actions)
+[![Release Version](https://img.shields.io/github/release/cesbit/go-qpack)](https://github.com/cesbit/go-qpack/releases)
 
 # Go-QPack
 
@@ -14,7 +14,7 @@ A fast (de)serializer for the Go language
 ## Installation
 Simple install the package to your [$GOPATH](https://github.com/golang/go/wiki/GOPATH "GOPATH") with the [go tool](https://golang.org/cmd/go/ "go command") from shell:
 ```bash
-$ go get github.com/transceptor-technology/go-qpack
+$ go get github.com/cesbit/go-qpack
 ```
 Make sure [Git is installed](https://git-scm.com/downloads) on your machine and in your system's `PATH`.
 
